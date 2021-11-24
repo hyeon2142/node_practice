@@ -1,9 +1,13 @@
 const http = require('http');
 const path = require('path');
 const express = require('express');
-
-const emaillistRouter = require('./routes/emaillist');
+const dotenv = require('dotenv');
+//const emaillistRouter = require('./routes/emaillist');
 const port = 8080;
+
+// 1. Environment Variables
+dotenv.config({path: path.join(__dirname, 'config/app.env')});
+
 
 // Application Setup
 const application = express()
@@ -20,27 +24,27 @@ const application = express()
         res.locals.req = req;
         res.locals.res = res;
         next();
-    })
-    .use('/', emaillistRouter);
+    });
+    //.use('/', emaillistRouter);
 
 
 // Server Setup
 http.createServer(application)
     .on('listening', function(){
-        console.info(`http server runs on ${port}`);
+        console.info(`http server runs on ${process.env.PORT}`);
     })
     .on('error', function(error){
         switch(error.code) {
             case 'EACCESS':
-                console.error(`${port} requires privileges`);
+                console.error(`${process.env.PORT} requires privileges`);
                 process.exit(1);
                 break;
             case 'EADDRINUSE':
-                console.error(`${port} is already in use`);
+                console.error(`${process.env.PORT} is already in use`);
                 process.exit(1);
                 break;
             default:
                 throw error;        
         }
     })
-    .listen(port);
+    .listen(process.env.PORT);
